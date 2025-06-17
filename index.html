@@ -21,15 +21,14 @@
 <body>
   <div id="root"></div>
 
-  <!-- Your React Component -->
   <script type="text/babel">
-    // Paste your entire App.jsx code here
-    const { useState } = React;
+    const { useState, useEffect } = React;
 
     function App() {
       const [activeTab, setActiveTab] = useState('home');
       const [language, setLanguage] = useState('en');
 
+      // Translations
       const translations = {
         en: {
           nav: { home: 'Home', portfolio: 'Portfolio', contact: 'Contact' },
@@ -59,6 +58,51 @@
 
       const t = translations[language];
 
+      // Project Data
+      const projects = [
+        {
+          id: 'quantum',
+          title: 'Quantum Circuit Simulator',
+          description: 'A physics-based puzzle game that teaches quantum computing principles through gameplay mechanics.',
+          image: '/assets/quantum.jpg',
+          fullDescription: 'This game combines educational content with fun gameplay, helping players understand complex quantum concepts through interactive puzzles.',
+          demoLink: '#'
+        },
+        {
+          id: 'arcade',
+          title: 'Neon Arcade Cabinet',
+          description: 'Custom-built retro arcade cabinet with embedded Raspberry Pi system and LED light show integration.',
+          image: '/assets/arcade.jpg',
+          fullDescription: 'A fully functional arcade machine built from scratch, featuring custom PCBs, RGB lighting, and classic emulators.',
+          demoLink: '#'
+        },
+        {
+          id: 'ai-dungeon',
+          title: 'AI Dungeon Master',
+          description: 'Machine learning-powered RPG engine that creates dynamic narratives based on player behavior.',
+          image: '/assets/ai-dungeon.jpg',
+          fullDescription: 'Uses NLP and neural networks to generate unique quests and storylines in real time.',
+          demoLink: '#'
+        },
+        {
+          id: 'smart-home',
+          title: 'Smart Home Controller',
+          description: 'IoT device with touch screen interface for managing home automation systems using ESP32 microcontroller.',
+          image: '/assets/smart-home.jpg',
+          fullDescription: 'A DIY smart home hub with voice control, sensors, and cloud sync capabilities.',
+          demoLink: '#'
+        }
+      ];
+
+      // Get current project from hash
+      const hash = window.location.hash.replace('#', '');
+      const [currentProject, setCurrentProject] = useState(null);
+
+      useEffect(() => {
+        const project = projects.find(p => `project-${p.id}` === hash) || null;
+        setCurrentProject(project);
+      }, [hash]);
+
       return (
         <div className="bg-gray-900 text-white min-h-screen font-sans">
           {/* Navigation */}
@@ -86,7 +130,7 @@
           </nav>
 
           {/* Home Section */}
-          {activeTab === 'home' && (
+          {activeTab === 'home' && !currentProject && (
             <section className="pt-28 pb-20 px-6">
               <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
@@ -106,7 +150,7 @@
                   </div>
                 </div>
                 <div className="relative">
-                  <img src="/assets/1000002015.jpg"  alt="Game development concept" className="rounded-2xl shadow-2xl object-cover w-full h-auto max-h-[500px]" />
+                  <img src="/assets/hero-image.jpg" alt="Game development concept" className="rounded-2xl shadow-2xl object-cover w-full h-auto max-h-[500px]" />
                   <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full blur-xl opacity-70"></div>
                 </div>
               </div>
@@ -114,7 +158,7 @@
           )}
 
           {/* Portfolio Section */}
-          {activeTab === 'portfolio' && (
+          {activeTab === 'portfolio' && !currentProject && (
             <section className="py-20 px-6 bg-gray-800/30">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
@@ -124,29 +168,10 @@
                   </p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-8">
-                  {[
-                    {
-                      title: "Quantum Circuit Simulator",
-                      description: "A physics-based puzzle game that teaches quantum computing principles through gameplay mechanics.",
-                      image: "https://picsum.photos/id/1011/800/600" 
-                    },
-                    {
-                      title: "Neon Arcade Cabinet",
-                      description: "Custom-built retro arcade cabinet with embedded Raspberry Pi system and LED light show integration.",
-                      image: "https://picsum.photos/id/1012/800/600" 
-                    },
-                    {
-                      title: "AI Dungeon Master",
-                      description: "Machine learning-powered RPG engine that creates dynamic narratives based on player behavior.",
-                      image: "https://picsum.photos/id/1015/800/600" 
-                    },
-                    {
-                      title: "Smart Home Controller",
-                      description: "IoT device with touch screen interface for managing home automation systems using ESP32 microcontroller.",
-                      image: "https://picsum.photos/id/1016/800/600" 
-                    }
-                  ].map((project, index) => (
-                    <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500 transition-all group">
+                  {projects.map((project, index) => (
+                    <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500 transition-all group cursor-pointer"
+                      onClick={() => window.location.hash = `project-${project.id}`}
+                    >
                       <img src={project.image} alt={project.title} className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500" />
                       <div className="p-6">
                         <h3 className="text-xl font-bold mb-2">{project.title}</h3>
@@ -166,8 +191,38 @@
             </section>
           )}
 
+          {/* Project Detail View */}
+          {activeTab === 'portfolio' && currentProject && (
+            <section className="py-20 px-6">
+              <div className="max-w-6xl mx-auto">
+                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700">
+                  <button 
+                    onClick={() => window.location.hash = ''} 
+                    className="mb-4 text-sm text-blue-400 hover:underline"
+                  >
+                    ← Back to Projects
+                  </button>
+                  <div className="flex flex-col md:flex-row gap-8">
+                    <div className="md:w-1/2">
+                      <img src={currentProject.image} alt={currentProject.title} className="rounded-lg w-full object-cover h-auto" />
+                    </div>
+                    <div className="md:w-1/2 space-y-4">
+                      <h2 className="text-2xl md:text-3xl font-bold">{currentProject.title}</h2>
+                      <p className="text-gray-300">{currentProject.fullDescription}</p>
+                      <div className="mt-6">
+                        <a href={currentProject.demoLink} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full font-semibold transition-all">
+                          View Live Demo
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Contact Section */}
-          {activeTab === 'contact' && (
+          {activeTab === 'contact' && !currentProject && (
             <section className="py-20 px-6">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
