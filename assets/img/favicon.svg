@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .p{stroke:#65549a} .b{fill:#65549a} .d{fill:#fcfbf8}
+    @media (prefers-color-scheme:dark){.p{stroke:#b6a8e6}.b{fill:#b6a8e6}.d{fill:#1b1a20}}
+  </style>
+  <g class="p" stroke-width="2" stroke-linecap="round">
+    <path d="M11 4v4M16 4v4M21 4v4M11 24v4M16 24v4M21 24v4M4 11h4M4 16h4M4 21h4M24 11h4M24 16h4M24 21h4"/>
+  </g>
+  <rect class="b" x="8" y="8" width="16" height="16" rx="2.5"/>
+  <circle class="d" cx="12" cy="12" r="1.6"/>
+</svg>

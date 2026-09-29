@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Managed power distribution board · Martin Maruna</title>
+  <meta name="description" content="Case study: a managed power distribution and monitoring board for an SBC home server. Per-port switching, INA226 telemetry, protection and soft-start from one 12 V / 150 W supply.">
+  <meta name="author" content="Martin Maruna">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131217" media="(prefers-color-scheme: dark)">
+  <link rel="canonical" href="https://martynezys.github.io/projects/power-board/">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../assets/img/apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Managed power distribution board for an SBC home server">
+  <meta property="og:description" content="Per-port switching, INA226 telemetry and soft-start from one 12 V / 150 W supply. Simulated inrush cut from 129 A to 1.08 A.">
+  <meta property="og:url" content="https://martynezys.github.io/projects/power-board/">
+  <meta property="og:image" content="https://martynezys.github.io/assets/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="../../assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+</head>
+<body class="cs">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="../../" aria-label="Martin Maruna, home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path d="M11 4v4M16 4v4M21 4v4M11 24v4M16 24v4M21 24v4M4 11h4M4 16h4M4 21h4M24 11h4M24 16h4M24 21h4"/><rect x="8" y="8" width="16" height="16" rx="2.5"/></g></svg>
+        <span>martin maruna</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="../../#now" class="hide-sm">Now</a>
+        <a href="../../#projects">Projects</a>
+        <a href="../../#about" class="hide-sm">About</a>
+        <a href="../../#contact">Contact</a>
+        <button class="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <a class="crumb" href="../../#projects">← All projects</a>
+      <header class="cs-head">
+        <div class="card-top" style="justify-content:flex-start;gap:14px"><span class="label">P-01 · Case study</span><span class="chip progress">In progress</span></div>
+        <h1>Managed power distribution board for an SBC home server</h1>
+        <p class="lead">One 12 V / 150 W supply, a custom PCB, and an ESP32-S3 that switches every port remotely, measures what each device draws, and protects each port from overcurrent and inrush. It's also my planned bachelor's thesis at VŠB-TUO.</p>
+        <dl class="meta-row">
+          <div><dt class="label">Role</dt><dd>Solo: design, build, firmware</dd></div>
+          <div><dt class="label">Started</dt><dd>June 2026</dd></div>
+          <div><dt class="label">Stage</dt><dd>Breadboard prototype</dd></div>
+          <div><dt class="label">Tools</dt><dd>Altium · LTspice · ESP32-S3 · INA226</dd></div>
+        </dl>
+      </header>
+    </div>
+
+    <section class="section" aria-labelledby="s1">
+      <div class="wrap">
+        <header class="section-head"><span class="no">01</span><h2 id="s1">The problem</h2></header>
+        <div class="prose">
+          <p>My home server is turning into a 3D-printed rack of single-board computers: a <strong>Radxa Dragon Q6A</strong> (main server), a <strong>Cubie A5E</strong> (network gateway), a <strong>ROCK 5T</strong> and a <strong>Raspberry Pi 4B</strong>, plus a bench of about 18 microcontroller boards used as a sensor mesh and firmware test bench.</p>
+          <p>Everything runs from one <strong>Mean Well LRS-150-12</strong> (12 V, 12.5 A). That's about 120 W continuous with margin. If every board pulled its rated maximum at once the total would sit right at that line. That limit is the reason for the board: switch devices on only when they're needed, see exactly what each one draws, and make sure a fault on one port can't take down the rest.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s2">
+      <div class="wrap">
+        <header class="section-head"><span class="no">02</span><h2 id="s2">Requirements</h2></header>
+        <div class="prose">
+          <ul>
+            <li>Generate <strong>12 V, 5 V and 3.3 V</strong> rails on the board, with each port wired to the rail its device needs.</li>
+            <li><strong>Switch each port independently</strong> from a phone (web UI over Tailscale, never exposed to the internet).</li>
+            <li><strong>Measure voltage, current and power</strong> per SBC port and report it as telemetry.</li>
+            <li><strong>Overcurrent protection</strong> and <strong>soft-start</strong>, so SBC input capacitors don't slam the rail at power-on.</li>
+            <li>Status LEDs per port, and switched, monitored fans on the 12 V rail.</li>
+            <li>Ports must never twitch on while the controller boots, and must <strong>not drop</strong> when the controller reboots.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s3">
+      <div class="wrap">
+        <header class="section-head"><span class="no">03</span><h2 id="s3">Architecture</h2></header>
+        <figure class="fig">
+          <div class="diagram-wrap">
+<svg class="dg" viewBox="0 0 980 400" role="img" aria-labelledby="dg-title dg-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="dg-title">Power board block diagram</title>
+<desc id="dg-desc">230 V AC feeds a Mean Well LRS-150-12. Its 12 V output goes through a fuse onto a 12 V bus. From the bus: two 12 V SBC ports for the Dragon Q6A and ROCK 5T; Buck A (5 V) to two SBC ports for the Cubie A5E and Raspberry Pi 4B; Buck B (5 V) to a switched, fused microcontroller bench; a switched, monitored fan output; and a 3.3 V buck powering the ESP32-S3 and I/O expander, which switch every port and read every INA226 over I2C and serve a web UI over Tailscale.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0L10 5L0 10z"/></marker></defs>
+<text class="s" x="16" y="190">230 V AC</text>
+<path class="ln" d="M16 206H86" marker-end="url(#ah)"/>
+<rect class="box" x="90" y="178" width="132" height="56" rx="5"/>
+<text class="t" x="102" y="202">LRS-150-12</text><text class="s" x="102" y="220">12 V · 150 W</text>
+<path class="ln" d="M222 206H244"/>
+<rect class="box" x="244" y="195" width="44" height="22" rx="3"/><text class="s" x="252" y="210">fuse</text>
+<path class="ln" d="M288 206H310"/>
+<path class="bus" d="M310 60V360"/>
+<text class="a" x="276" y="48">12 V bus</text>
+<circle cx="310" cy="60" r="3.2" class="arrow"/>
+<path class="ln" d="M310 60H498" marker-end="url(#ah)"/>
+<text class="a" x="352" y="52">12 V direct</text>
+<rect class="box" x="500" y="37" width="214" height="46" rx="5"/>
+<text class="t" x="512" y="57">2 × SBC port</text><text class="s" x="512" y="74">P-FET · INA226 · soft-start</text>
+<path class="ln" d="M714 60H734" marker-end="url(#ah)"/>
+<text class="t" x="740" y="57">Dragon Q6A · ROCK 5T</text><text class="s" x="740" y="74">12 V, up to 3 A each</text>
+<circle cx="310" cy="135" r="3.2" class="arrow"/>
+<path class="ln" d="M310 135H338" marker-end="url(#ah)"/>
+<rect class="box" x="340" y="112" width="130" height="46" rx="5"/>
+<text class="t" x="352" y="132">Buck A</text><text class="s" x="352" y="149">5 V · SBC</text>
+<path class="ln" d="M470 135H498" marker-end="url(#ah)"/>
+<rect class="box" x="500" y="112" width="214" height="46" rx="5"/>
+<text class="t" x="512" y="132">2 × SBC port</text><text class="s" x="512" y="149">P-FET · INA226 · soft-start</text>
+<path class="ln" d="M714 135H734" marker-end="url(#ah)"/>
+<text class="t" x="740" y="132">Cubie A5E · Raspberry Pi 4B</text><text class="s" x="740" y="149">5 V, up to 3 A each</text>
+<circle cx="310" cy="210" r="3.2" class="arrow"/>
+<path class="ln" d="M310 210H338" marker-end="url(#ah)"/>
+<rect class="box" x="340" y="187" width="130" height="46" rx="5"/>
+<text class="t" x="352" y="207">Buck B</text><text class="s" x="352" y="224">5 V · bench</text>
+<path class="ln" d="M470 210H498" marker-end="url(#ah)"/>
+<rect class="box" x="500" y="187" width="214" height="46" rx="5"/>
+<text class="t" x="512" y="207">Switched group</text><text class="s" x="512" y="224">shared fuse</text>
+<path class="ln" d="M714 210H734" marker-end="url(#ah)"/>
+<text class="t" x="740" y="207">Microcontroller bench</text><text class="s" x="740" y="224">ESP32 · Pico · Nano · Zero 2W</text>
+<circle cx="310" cy="285" r="3.2" class="arrow"/>
+<path class="ln" d="M310 285H498" marker-end="url(#ah)"/>
+<text class="a" x="352" y="277">12 V direct</text>
+<rect class="box" x="500" y="262" width="214" height="46" rx="5"/>
+<text class="t" x="512" y="282">Fan output</text><text class="s" x="512" y="299">switched · monitored</text>
+<path class="ln" d="M714 285H734" marker-end="url(#ah)"/>
+<text class="t" x="740" y="282">4 × 140 mm fans</text><text class="s" x="740" y="299">positive-pressure airflow</text>
+<circle cx="310" cy="360" r="3.2" class="arrow"/>
+<path class="ln" d="M310 360H338" marker-end="url(#ah)"/>
+<rect class="box" x="340" y="337" width="130" height="46" rx="5"/>
+<text class="t" x="352" y="357">Buck</text><text class="s" x="352" y="374">3.3 V · logic</text>
+<path class="ln" d="M470 360H498" marker-end="url(#ah)"/>
+<rect class="box acc" x="500" y="337" width="214" height="46" rx="5"/>
+<text class="t" x="512" y="357">ESP32-S3 + I/O expander</text><text class="a" x="512" y="374">EN + I²C to every port</text>
+<path class="ln" d="M714 360H734" marker-end="url(#ah)"/>
+<text class="t" x="740" y="357">Web UI / API</text><text class="s" x="740" y="374">over Tailscale only</text>
+</svg>
+          </div>
+          <figcaption>Each SBC port is a high-side P-channel MOSFET driven by an NPN transistor, with an INA226 on a 10 mΩ shunt and a soft-start gate network. The ESP32-S3 sets every port through an I2C I/O expander and reads every INA226 over the same bus.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>The rail plan came straight from datasheets. I'd assumed the SBCs were all 5 V, but the <strong>Dragon Q6A only accepts 12 V</strong> and the <strong>ROCK 5T takes 9–20 V</strong>. So two SBC ports sit on 12 V and two on 5 V, which shrank the 5 V converter from a guessed 15–20 A to about 6 A for the SBCs plus about 5 A for the bench.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s4">
+      <div class="wrap">
+        <header class="section-head"><span class="no">04</span><h2 id="s4">Key decisions</h2><span class="meta label">Each one has a written decision record</span></header>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Decision</th><th scope="col">Why</th></tr></thead>
+            <tbody>
+              <tr><td>Single-rail 12 V industrial supply (LRS-150-12)</td><td>Compact, quiet, screw terminals, whole budget on 12 V. The 150 W limit is what makes managed switching worth it.</td></tr>
+              <tr><td>High-side P-FET + NPN driver per port</td><td>Keeps every device's ground connected. The ESP32's 3.3 V GPIO can't drive a P-FET gate on a 5 V or 12 V rail directly.</td></tr>
+              <tr><td>FET chosen per rail</td><td>The AO3401 is logic-level but only rated ±12 V gate-source, so on 12 V it needs a ±20 V part or a clamped gate.</td></tr>
+              <tr><td>INA226 with 10 mΩ shunts on SBC ports</td><td>8.19 A full scale at 250 µA resolution. The breakout's 0.1 Ω shunt tops out around 0.8 A.</td></tr>
+              <tr><td>Two 5 V buck converters (SBC + bench)</td><td>A shorted microcontroller can't brown out the Pi. Sensing each input and output gives live converter efficiency.</td></tr>
+              <tr><td>Port state held by an I2C I/O expander</td><td>Otherwise any ESP32 reset (crash, watchdog, firmware update) would switch off the gateway and the main server. The gateway and main server default to on, the rest to off.</td></tr>
+              <tr><td>Staged bring-up, fused, one change at a time</td><td>No bench supply yet, so the fuse is the current limit, and a failure always points at the last thing added.</td></tr>
+              <tr class="hl"><td>Gate-drain (Miller) soft-start <span class="chip planned" style="margin-left:4px">Proposed</span></td><td>See below. It gets accepted once the scope capture matches the simulation.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s5">
+      <div class="wrap">
+        <header class="section-head"><span class="no">05</span><h2 id="s5">Soft-start: what the simulation caught</h2></header>
+        <div class="prose">
+          <p>The obvious way to soften turn-on is to slow the gate: a series resistor between the driver and the gate, plus a capacitor from gate to source. Before building it I simulated it in LTspice, and it had two problems:</p>
+          <ul>
+            <li>The 10 kΩ gate pull-up and the series resistor form a <strong>voltage divider</strong>: <code>Vgs = −Vrail · Rpu / (Rpu + Rser)</code>. With 47 kΩ at 12 V that's −2.1 V, below the FET's threshold, so <strong>it never turns on</strong>.</li>
+            <li>A gate-source capacitor only <strong>delays</strong> turn-on. During switching the gate sits on the Miller plateau, so the output still slews fast and inrush peaks at 7.4 A.</li>
+          </ul>
+          <p>The fix moves the capacitor to <strong>gate → drain</strong>, where it sets the output slew directly (<code>dV/dt ≈ I<sub>gate</sub> / C<sub>gd</sub></code>, so inrush ≈ <code>C<sub>load</sub> · dV/dt</code>). It makes the gate-source resistor much larger than the series one (470 k / 47 k → about −10.9 V, which also clamps Vgs safely). And it adds a 4.7 kΩ + diode path so turn-off stays fast, which matters for overcurrent cut-off.</p>
+        </div>
+
+        <figure class="fig">
+          <div class="frame">
+            <a class="only-light" href="../../assets/img/sim-turn-on-light.webp"><img src="../../assets/img/sim-turn-on-light.webp" width="1400" height="1123" alt="Turn-on comparison. Top: input current on a log scale, peaking at 129 A for the hard switch, 7.4 A with a gate-source cap and 10k series resistor, 1.08 A with the Miller-cap design, and staying near 0.25 mA for the 47k variant, which never turns on. Bottom: output voltage rising almost instantly for the hard switch and as a straight ramp over about 5.5 ms for the Miller-cap design." loading="lazy" decoding="async"></a>
+            <a class="only-dark" href="../../assets/img/sim-turn-on-dark.webp"><img src="../../assets/img/sim-turn-on-dark.webp" width="1400" height="1123" alt="Turn-on comparison. Top: input current on a log scale, peaking at 129 A for the hard switch, 7.4 A with a gate-source cap and 10k series resistor, 1.08 A with the Miller-cap design, and staying near 0.25 mA for the 47k variant, which never turns on. Bottom: output voltage rising almost instantly for the hard switch and as a straight ramp over about 5.5 ms for the Miller-cap design." loading="lazy" decoding="async"></a>
+          </div>
+          <figcaption>Turn-on into 470 µF ‖ 44 Ω (an emulated SBC input) at 12 V. LTspice 26.1.1 with approximate device models.</figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Variant</th><th scope="col">Peak inrush</th><th scope="col">Vgs when on</th><th scope="col">Output rise</th><th scope="col">Turn-off</th></tr></thead>
+            <tbody>
+              <tr><td>Hard switch (breadboard as built)</td><td class="num">129 A</td><td class="num">−12.0 V</td><td class="num">62 µs</td><td class="num">0.07 ms</td></tr>
+              <tr><td>Gate-source cap, 10 kΩ series</td><td class="num">7.4 A</td><td class="num">−6.0 V</td><td class="num">1.0 ms</td><td class="num">6.8 ms</td></tr>
+              <tr><td>Gate-source cap, 47 kΩ series</td><td class="num">never on</td><td class="num">−2.1 V</td><td class="num">–</td><td class="num">–</td></tr>
+              <tr class="hl"><td>Miller cap + fast turn-off (proposed)</td><td class="num">1.08 A</td><td class="num">−10.9 V</td><td class="num">5.5 ms</td><td class="num">0.71 ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <figure class="fig">
+          <div class="frame">
+            <a class="only-light" href="../../assets/img/sim-vgs-light.webp"><img src="../../assets/img/sim-vgs-light.webp" width="1400" height="835" alt="Gate-source voltage over the full on/off cycle: −12.0 V for the hard switch, −10.9 V for the Miller design after a plateau near −3.3 V while the output ramps, −6.0 V and −2.1 V for the two gate-source-cap variants. The shaded FET threshold band sits between −2 and −4 V." loading="lazy" decoding="async"></a>
+            <a class="only-dark" href="../../assets/img/sim-vgs-dark.webp"><img src="../../assets/img/sim-vgs-dark.webp" width="1400" height="835" alt="Gate-source voltage over the full on/off cycle: −12.0 V for the hard switch, −10.9 V for the Miller design after a plateau near −3.3 V while the output ramps, −6.0 V and −2.1 V for the two gate-source-cap variants. The shaded FET threshold band sits between −2 and −4 V." loading="lazy" decoding="async"></a>
+          </div>
+          <figcaption>The divider in action: the series resistor decides how hard the FET is driven. The flat step in the Miller trace is the plateau during which the output ramps.</figcaption>
+        </figure>
+
+        <figure class="fig">
+          <div class="frame"><img src="../../assets/img/ltspice-softstart-schematic.webp" width="600" height="440" alt="LTspice schematic of the proposed soft-start: P-channel MOSFET with 470k gate-source resistor, 47k series resistor to an NPN driver, 100 nF gate-drain capacitor, 4.7k collector pull-up and a diode for fast turn-off, driving 470 µF in parallel with 44 Ω." loading="lazy" decoding="async"></div>
+          <figcaption>The proposed gate network in LTspice.</figcaption>
+        </figure>
+
+        <div class="callout"><p>These are simulations with approximate models. The real test is Stage 3: the same circuit on the breadboard, captured on a lab oscilloscope, hard-switched vs. soft-start. That capture decides whether the design is accepted.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s6">
+      <div class="wrap">
+        <header class="section-head"><span class="no">06</span><h2 id="s6">Status &amp; timeline</h2></header>
+        <ol class="timeline">
+          <li class="done"><span class="when">Jun 2026</span><p>Scoped the board as distribute / switch / sense / protect. Chose and ordered the LRS-150-12.</p></li>
+          <li class="done"><span class="when">Jun 2026</span><p>Prototype parts in: ESP32-S3-DevKitC-1, AO3401 and IRF4905 P-FETs, INA226 breakout, power resistors, 470 µF caps.</p></li>
+          <li class="done"><span class="when">26 Jun 2026</span><p><strong>Stage 0 working:</strong> high-side switch + NPN driver on 3.3 V. Fixed a floating-input bug with a base pulldown.</p></li>
+          <li class="done"><span class="when">Sep 2026</span><p>Supply wired with an earthed mains cord and trimmed to 12.00 V.</p></li>
+          <li class="done"><span class="when">29 Sep 2026</span><p>SBC power requirements from datasheets, a design review and soft-start simulations. Decided the rail plan, reset behaviour and the 5 V split.</p></li>
+          <li class="next"><span class="when">Next</span><p>Stage 2: INA226 sensing, checked against a multimeter.</p></li>
+          <li class="next"><span class="when">Next</span><p>Stage 1: 12 V through a fuse with the IRF4905. Then Stage 3: soft-start on the scope.</p></li>
+          <li><span class="when">Later</span><p>Schematic and PCB rev-A in Altium, firmware and web UI, enclosure, then 24/7 operation with long-term logging.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="s7">
+      <div class="wrap">
+        <header class="section-head"><span class="no">07</span><h2 id="s7">What I've learned so far</h2></header>
+        <div class="prose">
+          <ul>
+            <li><strong>Always define the off state.</strong> The first breadboard switched on when I touched a resistor, because my body was acting as an antenna on a floating transistor base. A 10 kΩ pulldown fixed it for good.</li>
+            <li><strong>Check absolute maximums before drawing anything.</strong> The AO3401's ±12 V gate rating rules it out on 12 V without a clamp.</li>
+            <li><strong>Simulate the obvious fix.</strong> The soft-start divider would have cost a lab session to find on the bench.</li>
+            <li><strong>Safe defaults have a flip side.</strong> "Everything off on reset" also means a firmware update would reboot my whole network.</li>
+            <li><strong>Read the datasheet before assuming.</strong> Two of the four "5 V" boards turned out to be 12 V boards.</li>
+          </ul>
+          <p class="muted">The full project (decision records, dated lab notebook, SPICE files, test firmware and measurement plan) is documented in a repository that I'll make public once it's tidy.</p>
+          <!-- TODO: when the repo is public, add: <p><a class="btn" href="https://github.com/Martynezys/REPO">Project repository</a></p> -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="label">© 2026 Martin Maruna</span>
+      <span class="label"><a href="../../">Home</a> · <a href="mailto:martinez.maruna13@gmail.com">Email</a></span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/theme.js" defer></script>
+</body>
+</html>
