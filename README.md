@@ -19,4 +19,4 @@ assets/img/                    images (WebP), favicon, social preview
 - **"Now" section:** edit the list in `index.html` and bump the "Updated" date.
 - **New project:** copy an `<article class="card">` block in `index.html`. Status chip classes: `progress`, `running`, `planned`, or no class (neutral).
 - **Preview locally:** `python -m http.server 8000` in this folder, then open http://localhost:8000.
-- **TODOs:** LinkedIn and CV links are commented out in the Contact section of `index.html`. The project repo link is commented out at the end of the case study.
+- **TODOs:** the CV link is commented out in the Contact section of `index.html`, and the project repo link at the end of the case study.

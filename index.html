@@ -54,20 +54,21 @@
         <div>
           <p class="label">Applied Electronics · VŠB – Technical University of Ostrava</p>
           <h1 id="hero-title">Martin Maruna</h1>
-          <p class="lead">Electronics student building <strong>power, measurement and embedded hardware</strong>, and documenting every decision along the way.</p>
+          <p class="lead">Second-year Applied Electronics student. Interested in <strong>PCB design, embedded systems and measurement</strong>.</p>
           <div class="actions">
-            <a class="btn primary" href="#projects">See projects</a>
+            <a class="btn primary" href="#projects">Projects</a>
+            <a class="btn" href="https://www.linkedin.com/in/martin-maruna-a95021312/" rel="me">LinkedIn</a>
             <a class="btn" href="https://github.com/Martynezys" rel="me">GitHub</a>
             <a class="btn" href="mailto:martinez.maruna13@gmail.com">Email</a>
           </div>
         </div>
         <aside class="spec" aria-label="Quick facts">
-          <div class="spec-title"><span class="label">Quick facts</span><span class="label">rev 2026.09</span></div>
+          <div class="spec-title"><span class="label">Quick facts</span></div>
           <dl>
             <dt>Study</dt><dd>BSc Applied Electronics, FEI VŠB-TUO · 2nd year</dd>
             <dt>Focus</dt><dd>PCB design · embedded · measurement</dd>
             <dt>Learning</dt><dd>Digital design &amp; verification (SystemVerilog)</dd>
-            <dt>Building</dt><dd>Managed power board for an SBC server</dd>
+            <dt>Building</dt><dd>Power distribution board for an SBC server</dd>
             <dt>Based</dt><dd>Ostrava, CZ · from Žilina, SK</dd>
             <dt>Open to</dt><dd>Internships in electronics</dd>
           </dl>
@@ -79,14 +80,14 @@
     <section class="section" id="now" aria-labelledby="now-title">
       <div class="wrap">
         <header class="section-head">
-          <span class="no">01</span><h2 id="now-title">Now</h2>
+          <h2 id="now-title">Now</h2>
           <span class="meta label">Updated 29 Sep 2026</span>
         </header>
         <ul class="now-list">
-          <li><span class="label">Building</span><span>Power board, <strong>Stage 2</strong>: adding INA226 current/voltage sensing to the working breadboard switch. Then 12 V and soft-start on the scope.</span></li>
-          <li><span class="label">Learning</span><span>SystemVerilog on a Tang Nano 20K FPGA, with the goal of getting properly good at RTL and verification, not just dabbling.</span></li>
-          <li><span class="label">Looking for</span><span>A bachelor's thesis supervisor at FEI, and an electronics internship.</span></li>
-          <li><span class="label">Next up</span><span>A 3D-printed fixed-wing twin-boom UAV with an ArduPlane autopilot <span class="muted">(planned, not started)</span>.</span></li>
+          <li><span class="label">Building</span><span>Power board, stage 2: adding INA226 current and voltage sensing to the breadboard prototype.</span></li>
+          <li><span class="label">Learning</span><span>SystemVerilog on a Tang Nano 20K FPGA.</span></li>
+          <li><span class="label">Looking for</span><span>A bachelor's thesis supervisor at FEI and an electronics internship.</span></li>
+          <li><span class="label">Planned</span><span>A 3D-printed fixed-wing UAV with an ArduPlane autopilot.</span></li>
         </ul>
       </div>
     </section>
@@ -95,23 +96,22 @@
     <section class="section" id="projects" aria-labelledby="projects-title">
       <div class="wrap">
         <header class="section-head">
-          <span class="no">02</span><h2 id="projects-title">Projects</h2>
-          <span class="meta label">Status as of Sep 2026</span>
+          <h2 id="projects-title">Projects</h2>
         </header>
 
         <article class="feature" aria-labelledby="p1-title">
           <div>
-            <div class="card-top"><span class="label">P-01 · Featured · Planned thesis topic</span><span class="chip progress">In progress</span></div>
-            <h3 id="p1-title">Managed power distribution board for an SBC home server</h3>
-            <p>One 12 V / 150 W supply feeds a custom PCB. An ESP32-S3 on the board switches every port remotely, measures voltage, current and power per port with INA226 sensors, and protects each port with overcurrent cut-off and soft-start.</p>
-            <p class="result">My first soft-start design turned out, in simulation, to never switch the FET on. The fix cut simulated inrush into 470 µF from <strong>129 A to 1.08 A</strong>.</p>
+            <div class="card-top"><span class="label">Planned thesis topic</span><span class="chip progress">In progress</span></div>
+            <h3 id="p1-title">Power distribution board for an SBC home server</h3>
+            <p>A custom PCB that powers my home server from one 12 V / 150 W supply. An ESP32-S3 switches each port remotely and measures voltage, current and power per port with INA226 sensors. Each port has overcurrent protection and soft-start.</p>
+            <p class="result">Soft-start simulated in LTspice: inrush into 470 µF reduced from 129 A to 1.08 A.</p>
             <p class="specline">12 V · 150 W · 2×12 V + 2×5 V SBC ports · INA226 · ESP32-S3 · Altium · LTspice</p>
-            <a class="more" href="projects/power-board/">Read the case study →</a>
+            <a class="more" href="projects/power-board/">Case study →</a>
           </div>
           <figure>
             <div class="frame">
-              <img class="only-light" src="assets/img/sim-turn-on-light.webp" width="1400" height="1123" alt="Simulated turn-on of four gate-drive variants: inrush current peaks at 129 A for the hard switch, 7.4 A with a gate-source cap, 1.08 A with the proposed Miller-cap soft-start; one variant never turns on." loading="lazy" decoding="async">
-              <img class="only-dark" src="assets/img/sim-turn-on-dark.webp" width="1400" height="1123" alt="Simulated turn-on of four gate-drive variants: inrush current peaks at 129 A for the hard switch, 7.4 A with a gate-source cap, 1.08 A with the proposed Miller-cap soft-start; one variant never turns on." loading="lazy" decoding="async">
+              <img class="only-light" src="assets/img/sim-turn-on-light.webp" width="1400" height="1123" alt="Simulated turn-on of four gate-drive variants: inrush current peaks at 129 A for the hard switch, 7.4 A with a gate-source cap, 1.08 A with the Miller-cap soft-start; one variant never turns on." loading="lazy" decoding="async">
+              <img class="only-dark" src="assets/img/sim-turn-on-dark.webp" width="1400" height="1123" alt="Simulated turn-on of four gate-drive variants: inrush current peaks at 129 A for the hard switch, 7.4 A with a gate-source cap, 1.08 A with the Miller-cap soft-start; one variant never turns on." loading="lazy" decoding="async">
             </div>
             <figcaption class="cap">LTspice: turn-on into 470 µF ‖ 44 Ω at 12 V</figcaption>
           </figure>
@@ -119,24 +119,21 @@
 
         <div class="grid">
           <article class="card" aria-labelledby="p2-title">
-            <div class="card-top"><span class="label">P-02</span><span class="chip running">Running</span></div>
-            <h3 id="p2-title">Homelab</h3>
-            <p>A Radxa Dragon Q6A on Arch Linux ARM running nginx, a GregTech: New Horizons Minecraft server, Kiwix (offline Wikipedia) and Stirling-PDF, reached remotely over Tailscale. Next: a Cubie A5E as a firewall/Pi-hole gateway and a 3D-printed modular rack, fed by the power board.</p>
-            <p class="specline">Arch Linux ARM · nginx · Tailscale · self-hosting</p>
+            <div class="card-top"><h3 id="p2-title">Homelab</h3><span class="chip running">Running</span></div>
+            <p>Radxa Dragon Q6A on Arch Linux ARM running nginx, Kiwix and Stirling-PDF, accessed remotely over Tailscale. Planned: a Cubie A5E as firewall and Pi-hole gateway, and a 3D-printed rack powered by the board above.</p>
+            <p class="specline">Arch Linux ARM · nginx · Tailscale</p>
           </article>
 
           <article class="card" aria-labelledby="p3-title">
-            <div class="card-top"><span class="label">P-03</span><span class="chip">Learning</span></div>
-            <h3 id="p3-title">FPGA &amp; digital design</h3>
-            <p>Learning SystemVerilog on a Sipeed Tang Nano 20K with the open-source OSS-CAD-Suite toolchain. The direction I'm most curious about long term is RTL design and verification.</p>
+            <div class="card-top"><h3 id="p3-title">FPGA</h3><span class="chip">Learning</span></div>
+            <p>SystemVerilog on a Sipeed Tang Nano 20K with the open-source OSS-CAD-Suite toolchain. Interested in RTL design and verification.</p>
             <p class="specline">SystemVerilog · Tang Nano 20K · OSS-CAD-Suite</p>
           </article>
 
           <article class="card" aria-labelledby="p4-title">
-            <div class="card-top"><span class="label">P-04</span><span class="chip">Ongoing</span></div>
-            <h3 id="p4-title">Retro hardware repair &amp; restoration</h3>
-            <p>Restored a Sony VAIO Type P and modded a PSP. Right now I'm reshelling a Nintendo 3DS with new screens and softmodding a PS2 slim. I do fault-finding with a multimeter and a USB-PD meter, and I've flashed LineageOS onto an old phone.</p>
-            <p class="specline">Teardown · soldering · diagnostics · firmware</p>
+            <div class="card-top"><h3 id="p4-title">Old hardware restoration</h3><span class="chip">Ongoing</span></div>
+            <p>Restoring older devices like a Sony VAIO Type P, a PSP and a Nintendo 3DS. I also run a small flipping business: I buy worn but working handhelds, repair and reshell them, and sell them on.</p>
+            <p class="specline">Teardown · soldering · reshells · diagnostics</p>
           </article>
         </div>
       </div>
@@ -145,69 +142,40 @@
     <!-- About -->
     <section class="section" id="about" aria-labelledby="about-title">
       <div class="wrap">
-        <header class="section-head"><span class="no">03</span><h2 id="about-title">About</h2></header>
+        <header class="section-head"><h2 id="about-title">About</h2></header>
         <div class="two-col">
           <div>
-            <p>I'm a second-year <strong>Applied Electronics</strong> student at the Faculty of Electrical Engineering and Computer Science, VŠB – Technical University of Ostrava, originally from Žilina, Slovakia. I passed my first year with all 60 credits.</p>
-            <p>I learn best by building. Right now that's a power distribution and monitoring board for my own home server, which is also turning into my bachelor's thesis. I'm most drawn to <strong>measurement, embedded systems and signals</strong>, and I'm teaching myself digital design on an FPGA on the side.</p>
-            <p>I document projects like real engineering work: decision records, a dated lab notebook, simulations and measurements, including the parts that didn't work.</p>
+            <p>I'm a second-year Applied Electronics student at FEI, VŠB – Technical University of Ostrava, originally from Žilina, Slovakia. I passed my first year with all 60 credits.</p>
+            <p>My main project is a power distribution and monitoring board for my home server, which I plan to turn into my bachelor's thesis. I'm most interested in measurement, embedded systems and sensors, and I'm learning digital design on an FPGA.</p>
           </div>
           <div>
             <p class="label" style="margin-bottom:12px">Tools &amp; skills</p>
             <dl class="skills">
-              <div><dt class="label">Hardware</dt><dd>Schematic &amp; PCB design (learning Altium), LTspice, breadboard prototyping &amp; staged bring-up, soldering, multimeter diagnostics</dd></div>
+              <div><dt class="label">Hardware</dt><dd>Schematic &amp; PCB design (learning Altium), LTspice, breadboard prototyping, soldering, multimeter diagnostics</dd></div>
               <div><dt class="label">Embedded</dt><dd>ESP32-S3 (Arduino core), I2C sensors (INA226)</dd></div>
               <div><dt class="label">Digital</dt><dd>SystemVerilog basics, Tang Nano 20K, OSS-CAD-Suite</dd></div>
               <div><dt class="label">Linux</dt><dd>Arch Linux ARM, nginx, Tailscale, self-hosting</dd></div>
-              <div><dt class="label">3D</dt><dd>Unreal Engine 5. Some ZBrush, Marvelous Designer, UVs &amp; texturing</dd></div>
             </dl>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Creative -->
-    <section class="section" id="creative" aria-labelledby="creative-title">
-      <div class="wrap">
-        <header class="section-head"><span class="no">04</span><h2 id="creative-title">Off the clock: 3D</h2><span class="meta label">Side project</span></header>
-        <p class="muted prose">Electronics is the main track. Unreal Engine is where I switch off. <em>Projekt VTT</em> is a first-person survival shooter I built in UE5.4.1. At the moment I'm working on a PBR/environment asset pack.</p>
-        <div class="shots">
-          <figure>
-            <img src="assets/img/ue5-projekt-vtt.webp" width="960" height="540" alt="Projekt VTT: a ruined brick building at dusk with a campfire, rendered in Unreal Engine 5." loading="lazy" decoding="async">
-            <figcaption class="label">Projekt VTT · UE5.4.1</figcaption>
-          </figure>
-          <figure>
-            <img src="assets/img/ue5-vtt-inventory.webp" width="960" height="512" alt="Projekt VTT inventory screen showing modelled food cans with names, weights and descriptions." loading="lazy" decoding="async">
-            <figcaption class="label">Inventory &amp; items</figcaption>
-          </figure>
-          <figure>
-            <img src="assets/img/ue5-environment-test.webp" width="960" height="570" alt="Environment test in Unreal Engine 5: bare birch trees over a field of dry orange grass under a hazy sky." loading="lazy" decoding="async">
-            <figcaption class="label">Environment test</figcaption>
-          </figure>
-        </div>
-        <ul class="links">
-          <li><a class="btn" href="https://vimeo.com/1094175370/945b8af061">Projekt VTT video</a></li>
-          <li><a class="btn" href="https://www.artstation.com/martin_maruna">ArtStation</a></li>
-        </ul>
-      </div>
-    </section>
-
     <!-- Contact -->
     <section class="section" id="contact" aria-labelledby="contact-title">
       <div class="wrap">
-        <header class="section-head"><span class="no">05</span><h2 id="contact-title">Contact</h2></header>
-        <p class="muted">For internships, thesis ideas or questions about a project, email is best.</p>
+        <header class="section-head"><h2 id="contact-title">Contact</h2></header>
         <a class="contact-mail" href="mailto:martinez.maruna13@gmail.com">martinez.maruna13@gmail.com</a>
         <ul class="links">
+          <li><a class="btn" href="https://www.linkedin.com/in/martin-maruna-a95021312/" rel="me">LinkedIn</a></li>
           <li><a class="btn" href="https://github.com/Martynezys" rel="me">GitHub</a></li>
-          <!-- TODO: add LinkedIn when ready -->
-          <!-- <li><a class="btn" href="https://www.linkedin.com/in/YOUR-HANDLE" rel="me">LinkedIn</a></li> -->
           <!-- TODO: add cv.pdf to the repo root, then uncomment -->
           <!-- <li><a class="btn" href="cv.pdf">CV (PDF)</a></li> -->
         </ul>
       </div>
     </section>
   </main>
+
 
   <footer class="site-footer">
     <div class="wrap">
