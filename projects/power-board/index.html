@@ -68,7 +68,7 @@
         <header class="section-head"><h2 id="s1">The problem</h2></header>
         <div class="prose">
           <p>My home server is a set of single-board computers: a Radxa Dragon Q6A (main server), a Cubie A5E (network gateway), a ROCK 5T and a Raspberry Pi 4B, plus about 18 microcontroller boards used for sensors and firmware testing. They're going into a 3D-printed rack.</p>
-          <p>Everything runs from one Mean Well LRS-150-12 (12 V, 12.5 A), which leaves about 120 W for continuous use. With every board at its rated maximum the total would be right at that limit, so devices that don't need to run 24/7 are switched on only when needed, and each port's consumption is measured. A fault on one port shouldn't affect the others.</p>
+          <p>Everything runs from one Mean Well LRS-150-12 (12 V, 12.5 A), which leaves about 120 W for continuous use. With every port at its rated maximum the load would be about 127 W before converter losses and fans, above that limit, so devices that don't need to run 24/7 are switched on only when needed, and each port's consumption is measured. A fault on one port shouldn't affect the others.</p>
         </div>
       </div>
     </section>
@@ -203,7 +203,7 @@
           <table>
             <thead><tr><th scope="col">Variant</th><th scope="col">Peak inrush</th><th scope="col">Vgs when on</th><th scope="col">Output rise</th><th scope="col">Turn-off</th></tr></thead>
             <tbody>
-              <tr><td>Hard switch (breadboard as built)</td><td class="num">129 A</td><td class="num">−12.0 V</td><td class="num">62 µs</td><td class="num">0.07 ms</td></tr>
+              <tr><td>Hard switch (breadboard circuit, simulated)</td><td class="num">129 A</td><td class="num">−12.0 V</td><td class="num">62 µs</td><td class="num">0.07 ms</td></tr>
               <tr><td>Gate-source cap, 10 kΩ series</td><td class="num">7.4 A</td><td class="num">−6.0 V</td><td class="num">1.0 ms</td><td class="num">6.8 ms</td></tr>
               <tr><td>Gate-source cap, 47 kΩ series</td><td class="num">never on</td><td class="num">−2.1 V</td><td class="num">–</td><td class="num">–</td></tr>
               <tr class="hl"><td>Miller cap + fast turn-off (proposed)</td><td class="num">1.08 A</td><td class="num">−10.9 V</td><td class="num">5.5 ms</td><td class="num">0.71 ms</td></tr>
@@ -252,7 +252,7 @@
             <li>Floating NPN base: the first breadboard version switched on when touched. Fixed with a 10 kΩ base pulldown.</li>
             <li>The AO3401 is rated ±12 V gate-source, so it can't be used on 12 V ports without a gate clamp.</li>
             <li>The soft-start divider described above.</li>
-            <li>An ESP32 reset would have turned every port off, including the gateway and the main server. Port states are now held by an I/O expander.</li>
+            <li>An ESP32 reset would have turned every port off, including the gateway and the main server. Fix chosen: port states will be held by an I²C I/O expander (not built yet).</li>
             <li>The Dragon Q6A and ROCK 5T need 12 V, not 5 V.</li>
           </ul>
           <!-- TODO: when the project repo is public, add: <p><a class="btn" href="https://github.com/Martynezys/REPO">Project repository</a></p> -->
